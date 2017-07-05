@@ -3,7 +3,9 @@ package com.example.rickgz.flashlight;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.graphics.Color;
+import android.hardware.camera2.CameraManager;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
     //Window object, that will store a reference to the current window
     private Window window;
 
+    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+    String cameraId = camManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
+    camManager.setTorchMode(cameraId, true);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
                 window = getWindow();
                 View currentView = findViewById(R.id.layout);//window.getDecorView();
 
+                Context context = getApplicationContext();
+
                 flashlightOn = !flashlightOn;
                 if(flashlightOn) {
                     Log.d("BUTTON","buttonclick");
@@ -51,8 +59,11 @@ public class MainActivity extends AppCompatActivity {
                     currentView.setBackgroundColor(0xFFFFFFFF);
                     currentView.invalidate();
 
-                    if(flashAvailable) {
+                    if(flashAvailable(context)) {
                         //TODO: turn on flash
+                    }
+                    else {
+                        //TODO: errormessage
                     }
                 }
                 else {
