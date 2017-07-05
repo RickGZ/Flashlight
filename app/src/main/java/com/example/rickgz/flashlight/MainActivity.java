@@ -6,7 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
+import android.hardware.Camera;
 import android.graphics.Color;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -24,13 +24,12 @@ import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
     boolean flashlightOn = false;
-
-    //Variable to store brightness value
-    private int brightness;
     //Content resolver used as a handle to the system's settings
     private ContentResolver Conresolver;
     //Window object, that will store a reference to the current window
     private Window window;
+
+    Camera camera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,17 +60,18 @@ public class MainActivity extends AppCompatActivity {
                     currentView.invalidate();
 
                     if(flashAvailable(context)) {
-//                        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-//                        try {
-//                            for (String id : cameraManager.getCameraIdList()) {
-//
-//                                // Turn on the flash if camera has one
-//                                cameraManager.setTorchMode(id, flashlightOn);
-//                            }
-//                        } catch (CameraAccessException e) {
-//                            e.printStackTrace();
-//                        }
                         Log.d("FLASH","flash available");
+
+                        if (camera != null) {
+                            camera.release();
+                            camera = null;
+                        }
+                        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+                        Camera.Parameters parameters = camera.getParameters();
+                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                        camera.setParameters(parameters);
+                        camera.startPreview();
+                        camera.stopPreview();
                     }
                     else {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
@@ -79,6 +79,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
+                    if(flashAvailable(context)) {
+                        Log.d("FLASH","flash available");
+                        camera.startPreview();
+                    }
+                    else {
+                        sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
+                        Log.d("FLASH","flash unavailable");
+                    }
+
                     currentView.setBackgroundColor(0x000000);
                     currentView.invalidate();
 
