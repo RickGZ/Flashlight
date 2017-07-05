@@ -16,25 +16,14 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     boolean flashlightOn = false;
-    //Content resolver used as a handle to the system's settings
-    private ContentResolver Conresolver;
-    //Window object, that will store a reference to the current window
-    private Window window;
-
-    Camera camera;
+    private Camera camera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (camera != null) {
-            camera.release();
-            camera = null;
-        }
-        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-
-        Log.d("CREATION","app CREATED!");
+        camera = openCamera(camera);
 
         //Button that turns on the flashlight
         final Button button = (Button) findViewById(R.id.flashlightButton);
@@ -42,17 +31,13 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("NewApi")
             public void onClick(View v) {
                 Log.d("BUTTON","buttonclick");
-
                 Context context = getApplicationContext();
 
                 flashlightOn = !flashlightOn;
                 if(flashlightOn) {
                     if(flashAvailable(context)) {
                         Log.d("FLASH","flash available");
-                        Camera.Parameters parameters = camera.getParameters();
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                        camera.setParameters(parameters);
-                        camera.startPreview();
+                        turnOnFlashlight(camera);
                     }
                     else {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
@@ -61,10 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     if(flashAvailable(context)) {
-                        Camera.Parameters parameters = camera.getParameters();
-                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                        camera.setParameters(parameters);
-                        camera.stopPreview();
+                        turnOffFlashlight(camera);
                     }
                     else {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
@@ -90,5 +72,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         alertDialog.show();
+    }
+
+    private Camera openCamera(Camera camera) {
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+        return camera;
+    }
+
+    private void turnOnFlashlight(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(parameters);
+        camera.startPreview();
+    }
+
+    private void turnOffFlashlight(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(parameters);
+        camera.stopPreview();
     }
 }
