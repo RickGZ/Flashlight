@@ -2,6 +2,7 @@ package com.example.rickgz.flashlight;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
@@ -29,36 +30,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Button button = (Button) findViewById(R.id.flashlightButton);
-
         if(savedInstanceState != null) {
             Log.d("STATE", savedInstanceState.toString());
         }
 
         Log.d("CREATION","app created");
 
+        //Button that turns on the flashlight
+        final Button button = (Button) findViewById(R.id.flashlightButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //Get the current window
                 window = getWindow();
-                Context context = getApplicationContext();
-
-                View currentView = (View) findViewById(android.R.id.content);
+                View currentView = findViewById(R.id.layout);//window.getDecorView();
 
                 flashlightOn = !flashlightOn;
                 if(flashlightOn) {
-                    //screenBrightness(255, getApplicationContext());
-                    WindowManager.LayoutParams lp = window.getAttributes();
-                    lp.screenBrightness = 1;
-                    window.setAttributes(lp);
                     Log.d("BUTTON","buttonclick");
 
+                    currentView.setBackgroundColor(0xFFFFFFFF);
+                    currentView.invalidate();
+
+                    if(flashAvailable) {
+                        //TODO: turn on flash
+                    }
                 }
                 else {
-                    //screenBrightness(255, getApplicationContext());
-                    WindowManager.LayoutParams lp = window.getAttributes();
-                    lp.screenBrightness = -1;
-                    window.setAttributes(lp);
+                    currentView.setBackgroundColor(0x000000);
+                    currentView.invalidate();
                 }
             }
         });
@@ -68,5 +67,9 @@ public class MainActivity extends AppCompatActivity {
         Settings.System.putInt( context.getContentResolver(),
                                 Settings.System.SCREEN_BRIGHTNESS,
                                 level);
+    }
+
+    private boolean flashAvailable(Context context) {
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
     }
 }
