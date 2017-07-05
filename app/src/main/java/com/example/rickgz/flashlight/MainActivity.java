@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("FLASH","flash available");
                     }
                     else {
-                        sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed.");
+                        sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
                         Log.d("FLASH","flash unavailable");
                     }
                 }
