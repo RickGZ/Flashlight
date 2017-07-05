@@ -40,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d("STATE", savedInstanceState.toString());
         }
 
+
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+
         Log.d("CREATION","app CREATED!");
 
         //Button that turns on the flashlight
@@ -61,17 +68,10 @@ public class MainActivity extends AppCompatActivity {
 
                     if(flashAvailable(context)) {
                         Log.d("FLASH","flash available");
-
-                        if (camera != null) {
-                            camera.release();
-                            camera = null;
-                        }
-                        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
                         Camera.Parameters parameters = camera.getParameters();
                         parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                         camera.setParameters(parameters);
                         camera.startPreview();
-                        camera.stopPreview();
                     }
                     else {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
@@ -80,8 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     if(flashAvailable(context)) {
-                        Log.d("FLASH","flash available");
-                        camera.startPreview();
+                        Camera.Parameters parameters = camera.getParameters();
+                        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                        camera.setParameters(parameters);
+                        camera.stopPreview();
                     }
                     else {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
