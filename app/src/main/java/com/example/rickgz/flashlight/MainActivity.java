@@ -7,20 +7,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.graphics.Color;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.provider.Settings;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
     boolean flashlightOn = false;
@@ -36,11 +28,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState != null) {
-            Log.d("STATE", savedInstanceState.toString());
-        }
-
-
         if (camera != null) {
             camera.release();
             camera = null;
@@ -54,18 +41,12 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NewApi")
             public void onClick(View v) {
-                //Get the current window
-                window = getWindow();
-                View currentView = findViewById(R.id.layout);//window.getDecorView();
+                Log.d("BUTTON","buttonclick");
+
                 Context context = getApplicationContext();
 
                 flashlightOn = !flashlightOn;
                 if(flashlightOn) {
-                    Log.d("BUTTON","buttonclick");
-
-                    currentView.setBackgroundColor(0xFFFFFFFF);
-                    currentView.invalidate();
-
                     if(flashAvailable(context)) {
                         Log.d("FLASH","flash available");
                         Camera.Parameters parameters = camera.getParameters();
@@ -89,20 +70,6 @@ public class MainActivity extends AppCompatActivity {
                         sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed by the app.");
                         Log.d("FLASH","flash unavailable");
                     }
-
-                    currentView.setBackgroundColor(0x000000);
-                    currentView.invalidate();
-
-//                    CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-//                    try {
-//                        for (String id : cameraManager.getCameraIdList()) {
-//
-//                            // Turn off the flash if camera has one
-//                            cameraManager.setTorchMode(id, flashlightOn);
-//                        }
-//                    } catch (CameraAccessException e) {
-//                        e.printStackTrace();
-//                    }
                 }
             }
         });
