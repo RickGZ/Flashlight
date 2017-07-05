@@ -1,10 +1,15 @@
 package com.example.rickgz.flashlight;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
 import android.graphics.Color;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
@@ -27,10 +32,6 @@ public class MainActivity extends AppCompatActivity {
     //Window object, that will store a reference to the current window
     private Window window;
 
-    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-    String cameraId = camManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
-    camManager.setTorchMode(cameraId, true);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,16 +41,16 @@ public class MainActivity extends AppCompatActivity {
             Log.d("STATE", savedInstanceState.toString());
         }
 
-        Log.d("CREATION","app created");
+        Log.d("CREATION","app CREATED!");
 
         //Button that turns on the flashlight
         final Button button = (Button) findViewById(R.id.flashlightButton);
         button.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NewApi")
             public void onClick(View v) {
                 //Get the current window
                 window = getWindow();
                 View currentView = findViewById(R.id.layout);//window.getDecorView();
-
                 Context context = getApplicationContext();
 
                 flashlightOn = !flashlightOn;
@@ -60,27 +61,56 @@ public class MainActivity extends AppCompatActivity {
                     currentView.invalidate();
 
                     if(flashAvailable(context)) {
-                        //TODO: turn on flash
+//                        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+//                        try {
+//                            for (String id : cameraManager.getCameraIdList()) {
+//
+//                                // Turn on the flash if camera has one
+//                                cameraManager.setTorchMode(id, flashlightOn);
+//                            }
+//                        } catch (CameraAccessException e) {
+//                            e.printStackTrace();
+//                        }
+                        Log.d("FLASH","flash available");
                     }
                     else {
-                        //TODO: errormessage
+                        sendAlertDialog("Flash unavailable", "The phone's flashlight either does not exist or cannot be accessed.");
+                        Log.d("FLASH","flash unavailable");
                     }
                 }
                 else {
                     currentView.setBackgroundColor(0x000000);
                     currentView.invalidate();
+
+//                    CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+//                    try {
+//                        for (String id : cameraManager.getCameraIdList()) {
+//
+//                            // Turn off the flash if camera has one
+//                            cameraManager.setTorchMode(id, flashlightOn);
+//                        }
+//                    } catch (CameraAccessException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         });
     }
 
-    void screenBrightness(int level, Context context) {
-        Settings.System.putInt( context.getContentResolver(),
-                                Settings.System.SCREEN_BRIGHTNESS,
-                                level);
-    }
-
     private boolean flashAvailable(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+    }
+
+    private void sendAlertDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 }
