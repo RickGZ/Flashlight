@@ -12,7 +12,6 @@
         android:id="@+id/flashlightButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableBottom="@drawable/ic_flashlight"
         android:text=""
         android:background="#817e7e"
         app:layout_constraintBottom_toBottomOf="parent"
