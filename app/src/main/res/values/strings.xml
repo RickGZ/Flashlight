@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">Flashlight</string>
-    <string name="buttonExplanation">Press the button to toggle the light.</string>
 </resources>
